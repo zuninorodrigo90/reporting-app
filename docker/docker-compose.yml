@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: 'reporting'
+      MYSQL_USER: 'userrodrigo'
+      MYSQL_PASSWORD: 'userrodrigo'
+      MYSQL_ROOT_PASSWORD: 'userrodrigo'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ${PWD}/mysqlData:/var/lib/mysql
+      - ${PWD}/:/etc/mysql/conf.d
