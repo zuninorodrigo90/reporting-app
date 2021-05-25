@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toSet;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Report extends BaseEntity {
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
     private Boolean isPrivate;
     private String description;
