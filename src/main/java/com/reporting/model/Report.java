@@ -25,7 +25,7 @@ public class Report extends BaseEntity {
     @ManyToMany (fetch = FetchType.EAGER)
     private Set<Kpi> kpis;
 
-    public ReportDTO toDTO(Report report) {
+    public static ReportDTO toDTO(Report report) {
         return ReportDTO.builder()
                 .name(report.getName())
                 .description(report.getDescription())

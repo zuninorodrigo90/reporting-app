@@ -6,12 +6,15 @@ import com.reporting.model.dto.ReportDTO;
 import com.reporting.repository.KpiRepository;
 import com.reporting.repository.ReportRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
@@ -68,8 +71,8 @@ public class ReportService {
         }
         if (!CollectionUtils.isEmpty(dto.getKpis())) {
             Set<Kpi> kpis = new HashSet<>();
-            dto.getKpis().forEach(n -> {
-                        Kpi kpi = kpiRepository.findByName(n).orElseThrow(EntityNotFoundException::new);
+            dto.getKpis().forEach(name -> {
+                        Kpi kpi = kpiRepository.findByName(name).orElseThrow(EntityNotFoundException::new);
                         kpis.add(kpi);
                     }
             );
@@ -78,5 +81,10 @@ public class ReportService {
         Report reportUpdated = repository.save(report);
         log.debug("Report updated: [{}]", reportUpdated);
         return reportUpdated;
+    }
+
+    public Page<Report> getAll(Pageable pageable) {
+        log.debug("Getting all reports");
+        return repository.findAll(pageable);
     }
 }
