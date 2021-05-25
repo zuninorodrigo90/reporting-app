@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
@@ -19,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Report extends BaseEntity {
+    @Column(unique = true)
     private String name;
     private Boolean isPrivate;
     private String description;
