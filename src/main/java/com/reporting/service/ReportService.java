@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 
 @Service
@@ -50,5 +51,32 @@ public class ReportService {
         Report reportCreated = repository.save(report);
         log.debug("Report created: [{}]", reportCreated);
         return reportCreated;
+    }
+
+    @Transactional
+    public Report update(Long id, ReportDTO dto) {
+        log.debug("Updating Report: [{}]", dto);
+        Report report = repository.findById(id).orElseThrow(EntityNotFoundException::new);
+        if (StringUtils.isNotEmpty(dto.getName())) {
+            report.setName(dto.getName());
+        }
+        if(StringUtils.isNotEmpty(dto.getDescription())){
+            report.setDescription(dto.getDescription());
+        }
+        if (dto.getIsPrivate() != null) {
+            report.setIsPrivate(dto.getIsPrivate());
+        }
+        if (!CollectionUtils.isEmpty(dto.getKpis())) {
+            Set<Kpi> kpis = new HashSet<>();
+            dto.getKpis().forEach(n -> {
+                        Kpi kpi = kpiRepository.findByName(n).orElseThrow(EntityNotFoundException::new);
+                        kpis.add(kpi);
+                    }
+            );
+            report.setKpis(kpis);
+        }
+        Report reportUpdated = repository.save(report);
+        log.debug("Report updated: [{}]", reportUpdated);
+        return reportUpdated;
     }
 }

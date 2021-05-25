@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class Report extends BaseEntity {
     private String name;
     private Boolean isPrivate;
     private String description;
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
     private Set<Kpi> kpis;
 
     public ReportDTO toDTO(Report report) {

@@ -6,10 +6,7 @@ import com.reporting.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -27,6 +24,13 @@ public class ReportController extends BaseController {
         Report report = reportService.create(dto);
         ReportDTO result = report.toDTO(report);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ReportDTO> update(@PathVariable Long id, @RequestBody ReportDTO dto) {
+        Report report = reportService.update(id, dto);
+        ReportDTO result = report.toDTO(report);
+        return ResponseEntity.ok(result);
     }
 
 
