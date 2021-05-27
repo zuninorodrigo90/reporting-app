@@ -38,6 +38,7 @@ public class ReportController extends BaseController {
         return ResponseEntity.ok(result);
     }
 
+    @CrossOrigin
     @GetMapping("/list")
     public Page<ReportDTO> listAll(Pageable pageable) {
         Page<Report> reportsPage = reportService.getAll(pageable);

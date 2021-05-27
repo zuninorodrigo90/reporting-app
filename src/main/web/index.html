@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reporting</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-classic/resources/theme-classic-all.css"
+          rel="stylesheet"/>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+            Ext.define('Report', {
+                extend: 'Ext.data.Model',
+                fields: ['name', 'description', 'isPrivate']
+            });
+
+            Ext.create('Ext.panel.Panel', {
+                width: '100%',
+                renderTo: Ext.getBody(),
+                padding: 15,
+                items: [{
+                    xtype: 'button',
+                    margin: 5,
+                    text: 'Get Data using Ajax request',
+                    handler: function () {
+                        var me = this.up(),
+                            gridStore = me.down('#grid').getStore();
+                        me.down('#grid').mask('Please wait..');
+                        Ext.Ajax.request({
+                            url: 'http://localhost:8080/report/list?size=10&page=0',
+                            method: 'GET',
+                            success: function (response) {
+                                me.down('#grid').unmask();
+                                var data = Ext.decode(response.responseText);
+                                gridStore.loadData(data.content);
+                            },
+                            failure: function (response) {
+                                me.down('#grid').unmask();
+                                Ext.Msg.alert('Error', 'Error');
+                            }
+                        });
+                    }
+                }, {
+                    xtype: 'grid',
+                    itemId: 'grid',
+                    title: 'Report',
+                    columns: [{
+                        text: 'Name',
+                        dataIndex: 'name'
+                    }, {
+                        text: 'Description',
+                        dataIndex: 'description',
+                        flex: 1
+                    }, {
+                        xtype: 'checkcolumn',
+                        text: 'Private',
+                        dataIndex: 'isPrivate',
+                        listeners: {
+                            beforecheckchange: function() {
+                                return false;
+                            }
+                        },
+                    }],
+                    height: 200,
+                    width: '100%',
+                }]
+
+            });
+        });
+
+    </script>
+
+</head>
+
+<body>
+    <div id="helloWorldPanel"></div>
+</body>
+</html>
