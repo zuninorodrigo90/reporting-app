@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @RequestMapping(path = "/report")
+@CrossOrigin
 public class ReportController extends BaseController {
 
     private final ReportService reportService;
@@ -38,7 +39,6 @@ public class ReportController extends BaseController {
         return ResponseEntity.ok(result);
     }
 
-    @CrossOrigin
     @GetMapping("/list")
     public Page<ReportDTO> listAll(Pageable pageable) {
         Page<Report> reportsPage = reportService.getAll(pageable);
