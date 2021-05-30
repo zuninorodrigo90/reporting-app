@@ -6,13 +6,15 @@
           rel="stylesheet"/>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
 
         Ext.onReady(function () {
+
             Ext.define('Report', {
                 extend: 'Ext.data.Model',
-                fields: ['name', 'description', 'isPrivate']
+                fields: ['name', 'description', 'isPrivate', 'kpis'],
             });
 
             Ext.create('Ext.panel.Panel', {
@@ -22,9 +24,9 @@
                 items: [{
                     xtype: 'button',
                     margin: 5,
-                    text: 'Get Data using Ajax request',
+                    text: 'Show reports',
                     handler: function () {
-                        var me = this.up(),
+                        let me = this.up(),
                             gridStore = me.down('#grid').getStore();
                         me.down('#grid').mask('Please wait..');
                         Ext.Ajax.request({
@@ -32,7 +34,7 @@
                             method: 'GET',
                             success: function (response) {
                                 me.down('#grid').unmask();
-                                var data = Ext.decode(response.responseText);
+                                let data = Ext.decode(response.responseText);
                                 gridStore.loadData(data.content);
                             },
                             failure: function (response) {
@@ -41,6 +43,107 @@
                             }
                         });
                     }
+                }, {
+                    xtype: 'button',
+                    margin: 5,
+                    text: 'Create',
+                    handler: function () {
+
+                        win = new Ext.Window({
+                            title: 'Create report',
+                            width: 400,
+                            height: 400,
+                            floating: true,
+                            closable : true,
+                            modal: true,
+                            items: [{
+                                xtype: 'textfield',
+                                fieldLabel: 'Name',
+                                id: 'reportName'
+                            }, {
+                                xtype: 'textarea',
+                                fieldLabel: 'Description',
+                                id: 'reportDescription'
+                            }, {
+                                xtype: 'fieldcontainer',
+                                fieldLabel: 'Private',
+                                defaultType: 'checkboxfield',
+                                id: 'cbPrivate',
+                                items: [{
+                                }]
+                            }, {
+                                fieldLabel: 'KPIs',
+                                xtype: 'fieldcontainer',
+                                id: 'cbKpis',
+                            }],
+                            bbar: [{
+                                text: 'Save',
+                                handler: function(btn) {
+                                    let reportName = Ext.getCmp('reportName').getValue();
+                                    let reportDescription = Ext.getCmp('reportDescription').getValue();
+                                    let reportPrivate = Ext.getCmp('cbPrivate').down().getRawValue();
+                                    let kpisArray = checkboxGroup.getValue().kpiCheckboxes;
+                                    let kpis = kpisArray.map(name=> ({name: name}));
+                                    let kpis3 = {"kpis":{
+                                            "name" : "kpi1"
+                                        }}
+
+                                    let dataToSend = {
+                                        name : reportName, description : reportDescription, isPrivate: reportPrivate
+                                    }
+                                    let saveData = $.ajax({
+                                        type: 'POST',
+                                        url: "http://localhost:8080/report",
+                                        data: JSON.stringify(dataToSend),
+                                        contentType: 'application/json; charset=utf-8',
+                                        dataType: "json",
+                                        success: function(resultData) {
+                                            alert("Save Complete")
+                                        }
+                                    });
+                                }
+                            }, {
+                                text: 'Cancel',
+                                handler: function(btn) {
+                                    win.close();
+                                }
+                            }],
+                        });
+
+                        let menuArray = [];
+                        let checkboxGroup;
+                        Ext.Ajax.request({
+                            url: 'http://localhost:8080/kpi/list?size=10&page=0',
+                            method: 'GET',
+                            success: function(result, request) {
+                                let json = result.responseText;
+                                let temp = JSON.parse(json);
+                                for(let i=0;i<temp.content.length;i++){
+                                    menuArray.push({
+                                        xtype: 'checkboxfield',
+                                        boxLabel: temp.content[i].name,
+                                        name: 'kpiCheckboxes',
+                                        inputValue: temp.content[i].name,
+                                    });
+                                }
+
+                                checkboxGroup = new Ext.form.CheckboxGroup({
+                                    xtype: 'checkboxgroup',
+                                    columns: 2,
+                                    items: menuArray,
+                                    renderTo: cbKpis,
+                                });
+
+                            },failure: function(result, request) {
+                                Ext.Msg.alert('Error', 'An Error occured...');
+                            } });
+                        win.show();
+
+                    }
+                }, {
+                    xtype: 'button',
+                    margin: 5,
+                    text: 'Edit'
                 }, {
                     xtype: 'grid',
                     itemId: 'grid',
@@ -51,19 +154,21 @@
                     }, {
                         text: 'Description',
                         dataIndex: 'description',
-                        flex: 1
                     }, {
                         xtype: 'checkcolumn',
                         text: 'Private',
                         dataIndex: 'isPrivate',
                         listeners: {
-                            beforecheckchange: function() {
+                            beforecheckchange: function () {
                                 return false;
                             }
                         },
+                    }, {
+                        text: 'KPIs',
+                        dataIndex: 'kpis'
                     }],
                     height: 200,
-                    width: '100%',
+                    width: '50%',
                 }]
 
             });
@@ -74,6 +179,6 @@
 </head>
 
 <body>
-    <div id="helloWorldPanel"></div>
+<div id="helloWorldPanel"></div>
 </body>
 </html>
