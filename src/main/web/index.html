@@ -30,7 +30,7 @@
                             gridStore = me.down('#grid').getStore();
                         me.down('#grid').mask('Please wait..');
                         Ext.Ajax.request({
-                            url: 'http://localhost:8080/report/list?size=10&page=0',
+                            url: 'http://localhost:8080/report/list?size=20&page=0',
                             method: 'GET',
                             success: function (response) {
                                 me.down('#grid').unmask();
@@ -59,7 +59,7 @@
                             items: [{
                                 xtype: 'textfield',
                                 fieldLabel: 'Name',
-                                id: 'reportName'
+                                id: 'reportName',
                             }, {
                                 xtype: 'textarea',
                                 fieldLabel: 'Description',
@@ -80,27 +80,32 @@
                                 text: 'Save',
                                 handler: function(btn) {
                                     let reportName = Ext.getCmp('reportName').getValue();
-                                    let reportDescription = Ext.getCmp('reportDescription').getValue();
-                                    let reportPrivate = Ext.getCmp('cbPrivate').down().getRawValue();
-                                    let kpisArray = checkboxGroup.getValue().kpiCheckboxes;
-                                    let kpis = kpisArray.map(name=> ({name: name}));
-                                    let kpis3 = {"kpis":{
-                                            "name" : "kpi1"
-                                        }}
-
-                                    let dataToSend = {
-                                        name : reportName, description : reportDescription, isPrivate: reportPrivate
-                                    }
-                                    let saveData = $.ajax({
-                                        type: 'POST',
-                                        url: "http://localhost:8080/report",
-                                        data: JSON.stringify(dataToSend),
-                                        contentType: 'application/json; charset=utf-8',
-                                        dataType: "json",
-                                        success: function(resultData) {
-                                            alert("Save Complete")
+                                    if (reportName.length == "") {
+                                        alert("Name required")
+                                    } else {
+                                        let reportDescription = Ext.getCmp('reportDescription').getValue();
+                                        let reportPrivate = Ext.getCmp('cbPrivate').down().getRawValue();
+                                        let kpisArray = checkboxGroup.getChecked();
+                                        let kpis = [];
+                                        for(let i = 0; i < kpisArray.length; i++) {
+                                            kpis.push(kpisArray[i].inputValue)
                                         }
-                                    });
+                                        let dataToSend = {
+                                            name : reportName, description : reportDescription, isPrivate: reportPrivate, kpis: kpis
+                                        }
+                                        let saveData = $.ajax({
+                                            type: 'POST',
+                                            url: "http://localhost:8080/report",
+                                            data: JSON.stringify(dataToSend),
+                                            contentType: 'application/json; charset=utf-8',
+                                            dataType: "json",
+                                            success: function(resultData) {
+                                                alert("Save Complete")
+                                                win.close();
+                                            }
+                                        });
+                                    }
+
                                 }
                             }, {
                                 text: 'Cancel',
