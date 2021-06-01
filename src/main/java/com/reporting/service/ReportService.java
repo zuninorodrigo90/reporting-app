@@ -87,4 +87,9 @@ public class ReportService {
         log.debug("Getting all reports");
         return repository.findAll(pageable);
     }
+
+    public Report getById(Long id) {
+        log.debug("Getting report with id" + id);
+        return repository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
 }

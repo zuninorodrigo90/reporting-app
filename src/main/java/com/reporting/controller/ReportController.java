@@ -46,5 +46,12 @@ public class ReportController extends BaseController {
         return new PageImpl<>(reportsPage.stream().map(Report::toDTO).collect(Collectors.toList()), pageable, total);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
+        Report report = reportService.getById(id);
+        ReportDTO result = Report.toDTO(report);
+        return ResponseEntity.ok(result);
+    }
+
 
 }
