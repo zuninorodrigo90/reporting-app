@@ -8,6 +8,7 @@ import java.util.Set;
 @Getter
 @Builder
 public class ReportDTO {
+    private Long id;
     private String name;
     private Boolean isPrivate;
     private String description;

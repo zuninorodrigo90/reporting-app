@@ -29,6 +29,7 @@ public class Report extends BaseEntity {
 
     public static ReportDTO toDTO(Report report) {
         return ReportDTO.builder()
+                .id(report.getId())
                 .name(report.getName())
                 .description(report.getDescription())
                 .isPrivate(report.getIsPrivate())
