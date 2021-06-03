@@ -26,6 +26,7 @@
                     xtype: 'button',
                     margin: 5,
                     text: 'Show reports',
+                    id: "showReportsBtn",
                     handler: function () {
                         let me = this.up(),
                             gridStore = me.down('#grid').getStore();
@@ -64,7 +65,7 @@
                             }, {
                                 xtype: 'textarea',
                                 fieldLabel: 'Description',
-                                id: 'reportDescription'
+                                id: 'reportDescription',
                             }, {
                                 xtype: 'fieldcontainer',
                                 fieldLabel: 'Private',
@@ -103,7 +104,8 @@
                                             contentType: 'application/json; charset=utf-8',
                                             dataType: "json",
                                             success: function (resultData) {
-                                                alert("Save Complete")
+                                                alert("Save completed");
+                                                reloadGrid();
                                                 win.close();
                                             }
                                         });
@@ -225,7 +227,8 @@
                                                 contentType: 'application/json; charset=utf-8',
                                                 dataType: "json",
                                                 success: function (resultData) {
-                                                    alert("Update Complete")
+                                                    alert("Update completed");
+                                                    reloadGrid();
                                                     win.close();
                                                 }
                                             });
@@ -289,14 +292,17 @@
                     title: 'Report',
                     columns: [{
                         text: 'Name',
-                        dataIndex: 'name'
+                        dataIndex: 'name',
+                        width: '20%'
                     }, {
                         text: 'Description',
                         dataIndex: 'description',
+                        width: '40%'
                     }, {
                         xtype: 'checkcolumn',
                         text: 'Private',
                         dataIndex: 'isPrivate',
+                        width: '10%',
                         listeners: {
                             beforecheckchange: function () {
                                 return false;
@@ -304,24 +310,28 @@
                         },
                     }, {
                         text: 'KPIs',
-                        dataIndex: 'kpis'
+                        dataIndex: 'kpis',
+                        width: '30%'
                     }, {
                         text: 'ID',
                         dataIndex: 'id',
                         hidden: true
                     }],
-                    height: 200,
-                    width: '50%',
+                    height: 300,
+                    width: '100%',
                 }]
 
             });
         });
+
+        function reloadGrid() {
+            document.getElementById('showReportsBtn').click()
+        }
 
     </script>
 
 </head>
 
 <body>
-<div id="helloWorldPanel"></div>
 </body>
 </html>
