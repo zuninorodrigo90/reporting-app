@@ -6,7 +6,8 @@
           rel="stylesheet"/>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
 
@@ -14,7 +15,7 @@
 
             Ext.define('Report', {
                 extend: 'Ext.data.Model',
-                fields: ['name', 'description', 'isPrivate', 'kpis'],
+                fields: ['name', 'description', 'isPrivate', 'kpis', 'id'],
             });
 
             Ext.create('Ext.panel.Panel', {
@@ -54,7 +55,7 @@
                             width: 400,
                             height: 400,
                             floating: true,
-                            closable : true,
+                            closable: true,
                             modal: true,
                             items: [{
                                 xtype: 'textfield',
@@ -69,8 +70,7 @@
                                 fieldLabel: 'Private',
                                 defaultType: 'checkboxfield',
                                 id: 'cbPrivate',
-                                items: [{
-                                }]
+                                items: [{}]
                             }, {
                                 fieldLabel: 'KPIs',
                                 xtype: 'fieldcontainer',
@@ -78,7 +78,7 @@
                             }],
                             bbar: [{
                                 text: 'Save',
-                                handler: function(btn) {
+                                handler: function (btn) {
                                     let reportName = Ext.getCmp('reportName').getValue();
                                     if (reportName.length == "") {
                                         alert("Name required")
@@ -87,11 +87,14 @@
                                         let reportPrivate = Ext.getCmp('cbPrivate').down().getRawValue();
                                         let kpisArray = checkboxGroup.getChecked();
                                         let kpis = [];
-                                        for(let i = 0; i < kpisArray.length; i++) {
+                                        for (let i = 0; i < kpisArray.length; i++) {
                                             kpis.push(kpisArray[i].inputValue)
                                         }
                                         let dataToSend = {
-                                            name : reportName, description : reportDescription, isPrivate: reportPrivate, kpis: kpis
+                                            name: reportName,
+                                            description: reportDescription,
+                                            isPrivate: reportPrivate,
+                                            kpis: kpis
                                         }
                                         let saveData = $.ajax({
                                             type: 'POST',
@@ -99,7 +102,7 @@
                                             data: JSON.stringify(dataToSend),
                                             contentType: 'application/json; charset=utf-8',
                                             dataType: "json",
-                                            success: function(resultData) {
+                                            success: function (resultData) {
                                                 alert("Save Complete")
                                                 win.close();
                                             }
@@ -109,7 +112,7 @@
                                 }
                             }, {
                                 text: 'Cancel',
-                                handler: function(btn) {
+                                handler: function (btn) {
                                     win.close();
                                 }
                             }],
@@ -120,10 +123,10 @@
                         Ext.Ajax.request({
                             url: 'http://localhost:8080/kpi/list?size=10&page=0',
                             method: 'GET',
-                            success: function(result, request) {
+                            success: function (result, request) {
                                 let json = result.responseText;
                                 let temp = JSON.parse(json);
-                                for(let i=0;i<temp.content.length;i++){
+                                for (let i = 0; i < temp.content.length; i++) {
                                     menuArray.push({
                                         xtype: 'checkboxfield',
                                         boxLabel: temp.content[i].name,
@@ -139,16 +142,147 @@
                                     renderTo: cbKpis,
                                 });
 
-                            },failure: function(result, request) {
+                            }, failure: function (result, request) {
                                 Ext.Msg.alert('Error', 'An Error occured...');
-                            } });
+                            }
+                        });
                         win.show();
 
                     }
                 }, {
                     xtype: 'button',
                     margin: 5,
-                    text: 'Edit'
+                    text: 'Edit',
+                    handler: function () {
+                        let me = this.up(),
+                            gridStore = me.down('#grid').getSelectionModel();
+                        if (gridStore.getSelection().length == 0) {
+                            alert('You should select a row to update')
+                        } else {
+                            idSelected = gridStore.getSelection()[0].data.id;
+                            nameSelected = gridStore.getSelection()[0].data.name;
+                            descriptionSelected = gridStore.getSelection()[0].data.description;
+                            privateSelected = gridStore.getSelection()[0].data.isPrivate;
+                            kpisSelected = gridStore.getSelection()[0].data.kpis;
+
+                            win = new Ext.Window({
+                                title: 'Update report',
+                                width: 400,
+                                height: 400,
+                                floating: true,
+                                closable: true,
+                                modal: true,
+                                items: [{
+                                    xtype: 'textfield',
+                                    fieldLabel: 'Name',
+                                    id: 'reportName',
+                                    value: nameSelected
+                                }, {
+                                    xtype: 'textarea',
+                                    fieldLabel: 'Description',
+                                    id: 'reportDescription',
+                                    value: descriptionSelected
+                                }, {
+                                    xtype: 'fieldcontainer',
+                                    fieldLabel: 'Private',
+                                    defaultType: 'checkboxfield',
+                                    id: 'cbPrivate',
+                                    active: true,
+                                    items: [{
+                                        name: 'private',
+                                        checked: privateSelected,
+                                        id: 'checkboxPrivate'
+                                    }]
+                                }, {
+                                    fieldLabel: 'KPIs',
+                                    xtype: 'fieldcontainer',
+                                    id: 'cbKpis',
+                                }],
+                                bbar: [{
+                                    text: 'Update',
+                                    handler: function (btn) {
+                                        let reportName = Ext.getCmp('reportName').getValue();
+                                        if (reportName.length == "") {
+                                            alert("Name required")
+                                        } else {
+                                            let reportDescription = Ext.getCmp('reportDescription').getValue();
+                                            let reportPrivate = Ext.getCmp('cbPrivate').down().getRawValue();
+                                            let kpisArray = checkboxGroup.getChecked();
+                                            let kpis = [];
+                                            for (let i = 0; i < kpisArray.length; i++) {
+                                                kpis.push(kpisArray[i].inputValue)
+                                            }
+                                            let dataToSend = {
+                                                name: reportName,
+                                                description: reportDescription,
+                                                isPrivate: reportPrivate,
+                                                kpis: kpis
+                                            }
+                                            let saveData = $.ajax({
+                                                type: 'PUT',
+                                                url: "http://localhost:8080/report/" + idSelected,
+                                                data: JSON.stringify(dataToSend),
+                                                contentType: 'application/json; charset=utf-8',
+                                                dataType: "json",
+                                                success: function (resultData) {
+                                                    alert("Update Complete")
+                                                    win.close();
+                                                }
+                                            });
+                                        }
+
+                                    }
+                                }, {
+                                    text: 'Cancel',
+                                    handler: function (btn) {
+                                        win.close();
+                                    }
+                                }],
+                            });
+
+                            function checkKpis(value, selectedKpis) {
+                                for(let i = 0; i < selectedKpis.length; i++) {
+                                    if (value == selectedKpis[i]) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+
+                            let menuArray = [];
+                            let checkboxGroup;
+                            Ext.Ajax.request({
+                                url: 'http://localhost:8080/kpi/list?size=10&page=0',
+                                method: 'GET',
+                                success: function (result, request) {
+                                    let json = result.responseText;
+                                    let temp = JSON.parse(json);
+                                    for (let i = 0; i < temp.content.length; i++) {
+                                        menuArray.push({
+                                            xtype: 'checkboxfield',
+                                            boxLabel: temp.content[i].name,
+                                            name: 'kpiCheckboxes',
+                                            inputValue: temp.content[i].name,
+                                            checked: checkKpis(temp.content[i].name, kpisSelected)
+                                        });
+                                    }
+
+                                    checkboxGroup = new Ext.form.CheckboxGroup({
+                                        xtype: 'checkboxgroup',
+                                        columns: 2,
+                                        items: menuArray,
+                                        renderTo: cbKpis,
+                                    });
+
+                                }, failure: function (result, request) {
+                                    Ext.Msg.alert('Error', 'An Error occured...');
+                                }
+                            });
+                            win.show();
+
+                        }
+                    }
+
                 }, {
                     xtype: 'grid',
                     itemId: 'grid',
@@ -171,6 +305,10 @@
                     }, {
                         text: 'KPIs',
                         dataIndex: 'kpis'
+                    }, {
+                        text: 'ID',
+                        dataIndex: 'id',
+                        hidden: true
                     }],
                     height: 200,
                     width: '50%',

@@ -6,6 +6,7 @@ import com.reporting.model.dto.ReportDTO;
 import com.reporting.repository.KpiRepository;
 import com.reporting.repository.ReportRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 
 
 @Service
